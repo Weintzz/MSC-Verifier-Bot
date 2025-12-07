@@ -33,10 +33,8 @@ def verify(conn, msc_id, student_no, email):
 
     if result:
         print(f"You are now verified, {result[9]}")
+        return True
         #dito ilalagay ung sa discord side  
     else:
         print("Verificaition failed. Wrong MSC ID/Student ID/Personal Email")
-
-conn = initialize()
-verify(conn, "MSCEB252619", "2023104357", "jameslaurencebelen@gmail.com")
-close(conn)
+        return False

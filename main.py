@@ -14,28 +14,19 @@ class Client(commands.Bot):
         
         try:
             synced = await self.tree.sync(guild=GUILD_ID)
-            print(f'Synced {len(synced)} command(s)')
+            print(f'Synced {len(synced)} command(s)') #confirmation lang na nag sync ung commands sa server
         except Exception as e:
             print(e)
-
-    async def on_message(self, message):
-        if message.author == self.user:
-            return
-        
-        print(f'{message.author} : {message.content}')
-        
-        if message.content == "hello":
-            await message.channel.send(f"hi")
 
 
 intents = discord.Intents.default()
 intents.message_content = True
-client = Client(command_prefix="!", intents=discord.Intents.all())
+client = Client(command_prefix="!", intents=discord.Intents.all()) #required talaga ung command prefix para gumana ung slash commands
 
-@client.tree.command(name="verify", description="verifies your membership", guild=GUILD_ID)
-async def verifyMember(interaction: discord.Interaction, msc_id: str, student_number: str, email: str):
+@client.tree.command(name="verify", description="verifies your membership", guild=GUILD_ID) #initializes the slash command 'verify'
+async def verifyMember(interaction: discord.Interaction, msc_id: str, student_number: str, email: str): #ginagawa nyang required maglagay ng parameters sa slash command
     await interaction.response.send_message(f"Confirm: \nMSC ID: {msc_id}\nStudent Number: {student_number}\nEmail: {email}",
-    ephemeral=True)
+    ephemeral=True) #ephemeral = True, ibigsabihin sarili lang makakakita
 
 
 client.run(os.getenv('BOT_TOKEN'))

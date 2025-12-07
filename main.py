@@ -28,7 +28,8 @@ async def verifyMember(interaction: discord.Interaction, msc_id: str, student_nu
     if not msc_id.startswith("MSC"):
         await interaction.response.send_message(f"Your MSC ID: {msc_id} is invalid.", ephemeral=True)
         return
-    if len(student_number) > 10 or not student_number.isnumeric():
+    if len(student_number) != 10 or not student_number.isnumeric():
+        print(len(student_number))
         await interaction.response.send_message(f"Your Student Number {student_number} is invalid.", ephemeral=True)
         return
     if "@" not in email or ".com" not in email:

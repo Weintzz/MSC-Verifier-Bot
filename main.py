@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
 import os
-import asyncio
 
 
 
@@ -41,7 +40,9 @@ async def on_message(message):
     VERIFY_CHANNEL_ID = int(os.getenv("VERIFY_CHANNEL_ID"))
 
     if message.channel.id == VERIFY_CHANNEL_ID:
-        await message.delete()  # delete spam or any other message except /verify
+        # Check if the message is not a valid slash command
+        if not message.content == "/verify":
+            await message.delete()  # delete spam or any other message except valid slash commands
 
     await client.process_commands(message)  # Para gumana pa ung ibang commands
 

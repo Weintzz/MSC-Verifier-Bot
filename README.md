@@ -38,10 +38,24 @@ MSC-Verifier-Bot is a Discord bot designed to verify members using a slash comma
 
 ## Usage
 
-Run the bot using the following command:
+Run the bot using one of the following commands:
+
+### Terminal
 ```bash
 python3 main.py
 ```
+
+### Alternative Commands
+Depending on your system configuration, you can also use:
+```bash
+py main.py
+```
+```bash
+py3 main.py
+```
+
+### Button
+If you are using an IDE or code editor with a "Run" button, you can click it to execute the bot.
 
 ## Commands
 

@@ -77,7 +77,7 @@ async def verifyMember(interaction: discord.Interaction, msc_id: str, student_nu
 
 
     else:
-        await interaction.response.send_message("Verification failed. Wrong Credentials.", ephemeral=True)
+        await interaction.response.send_message("Verification failed, credentials are not found in the system.", ephemeral=True)
     
 
 client.run(os.getenv('BOT_TOKEN'))

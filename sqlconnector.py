@@ -36,5 +36,5 @@ def verify(conn, msc_id, student_no, email):
         return True
         #dito ilalagay ung sa discord side  
     else:
-        print("Verificaition failed. Wrong MSC ID/Student ID/Personal Email")
+        print("Verification failed. Wrong MSC ID/Student ID/Personal Email")
         return False

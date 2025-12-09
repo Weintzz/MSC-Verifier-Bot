@@ -34,6 +34,11 @@ MSC-Verifier-Bot is a Discord bot designed to verify members using a slash comma
    LOGS_CHANNEL_ID=your_logs_channel_id
    VERIFIED_ROLE_ID=your_verified_role_id
    UNVERIFIED_ROLE_ID=your_unverified_role_id
+
+   host=host_db
+   user=user_db
+   password=password_db
+   database=database_name
    ```
 
 ## Usage

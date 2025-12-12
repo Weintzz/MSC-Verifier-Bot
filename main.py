@@ -49,18 +49,20 @@ async def on_message(message):
 
 @client.tree.command(name="verify", description="verifies your membership", guild=GUILD_ID) #initializes the slash command 'verify'
 async def verifyMember(interaction: discord.Interaction, msc_id: str, student_number: str, email: str): #ginagawa nyang required maglagay ng parameters sa slash command
+    await interaction.response.defer(ephemeral=True)
 
     conn = sqlconnector.initialize()
+    username = str(interaction.user)
     exists = sqlconnector.check_multiple(conn, msc_id, username)
-    username = interaction.user
+    
 
     if sqlconnector.verify(conn, msc_id, student_number, email) and not exists:
-        sqlconnector.add_user(conn, msc_id, student_number, username)
+        
         
         member = interaction.guild.get_member(interaction.user.id)
         logs_channel = interaction.guild.get_channel(int(os.getenv("LOGS_CHANNEL_ID")))
         
-        await interaction.response.send_message("You are now verified!", ephemeral=True)   
+        await interaction.followup.send("You are now verified!", ephemeral=True)   
 
         await logs_channel.send(
             f"{interaction.user.mention} has been verified\n"
@@ -76,16 +78,17 @@ async def verifyMember(interaction: discord.Interaction, msc_id: str, student_nu
         remove_role = interaction.guild.get_role(UNVERIFIED_ROLE_ID) #gets both roles' ID
         await member.remove_roles(remove_role) #adds Member role and removes Unverified role
         await member.add_roles(add_role)
+        sqlconnector.add_user(conn, msc_id, student_number, username)
 
 
     elif exists == 3:
-        await interaction.response.send_message("You are already verified", ephemeral=True)
+        await interaction.followup.send("You are already verified", ephemeral=True)
     elif exists == 2:
-        await interaction.response.send_message("MSC ID is already verified with different discord account. Use /update to change your information", ephemeral=True)
+        await interaction.followup.send("MSC ID is already verified with different discord account. Use /update to change your information", ephemeral=True)
     elif exists == 1:
-        await interaction.response.send_message("Discord account is already verified with different MSC ID. Use /update to change your information", ephemeral=True)
+        await interaction.followup.send("Discord account is already verified with different MSC ID. Use /update to change your information", ephemeral=True)
     else:
-        await interaction.response.send_message("Verification failed, credentials are not found in the system.", ephemeral=True)
+        await interaction.followup.send("Verification failed, credentials are not found in the system.", ephemeral=True)
     
 
 client.run(os.getenv('BOT_TOKEN'))

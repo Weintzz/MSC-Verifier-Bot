@@ -41,9 +41,9 @@ def verify(conn, msc_id, student_no, email):
 
 def check_multiple(conn, msc_id, discord_username):
     cursor = conn.cursor()
-    cursor.execute("SELECT EXISTS(SELECT 1 FROM MSC_ID WHERE MSC_ID = %s)", (msc_id,))
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE MSC_ID = %s)", (msc_id,))
     msc_id_exists = cursor.fetchone()[0]
-    cursor.execute("SELECT EXISTS(SELECT 1 FROM MSC_ID WHERE DISCORD_USERNAME = %s)", (discord_username,))
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE DISCORD_USERNAME = %s)", (discord_username,))
     discord_username_exists = cursor.fetchone()[0]
 
     if msc_id_exists and discord_username_exists: # ibig sabihin neto already verified

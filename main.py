@@ -49,13 +49,15 @@ async def on_message(message):
 
 @client.tree.command(name="verify", description="verifies your membership", guild=GUILD_ID) #initializes the slash command 'verify'
 async def verifyMember(interaction: discord.Interaction, msc_id: str, student_number: str, email: str): #ginagawa nyang required maglagay ng parameters sa slash command
-    
-   
 
     conn = sqlconnector.initialize()
-    if sqlconnector.verify(conn, msc_id, student_number, email):
-        member = interaction.guild.get_member(interaction.user.id)
+    exists = sqlconnector.check_multiple(conn, msc_id, username)
+    username = interaction.user
 
+    if sqlconnector.verify(conn, msc_id, student_number, email) and not exists:
+        sqlconnector.add_user(conn, msc_id, student_number, username)
+        
+        member = interaction.guild.get_member(interaction.user.id)
         logs_channel = interaction.guild.get_channel(int(os.getenv("LOGS_CHANNEL_ID")))
         
         await interaction.response.send_message("You are now verified!", ephemeral=True)   
@@ -76,6 +78,12 @@ async def verifyMember(interaction: discord.Interaction, msc_id: str, student_nu
         await member.add_roles(add_role)
 
 
+    elif exists == 3:
+        await interaction.response.send_message("You are already verified", ephemeral=True)
+    elif exists == 2:
+        await interaction.response.send_message("MSC ID is already verified with different discord account. Use /update to change your information", ephemeral=True)
+    elif exists == 1:
+        await interaction.response.send_message("Discord account is already verified with different MSC ID. Use /update to change your information", ephemeral=True)
     else:
         await interaction.response.send_message("Verification failed, credentials are not found in the system.", ephemeral=True)
     

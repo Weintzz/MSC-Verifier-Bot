@@ -5,12 +5,14 @@ from discord.ext import commands
 from discord import app_commands
 import os
 
+from keep_alive import keep_alive # para di mag sleep
 
 
 
 load_dotenv()
 GUILD_ID = discord.Object(id=int(os.getenv('GUILD_ID')))
 
+keep_alive()
 
 class Client(commands.Bot):
     async def on_ready(self):

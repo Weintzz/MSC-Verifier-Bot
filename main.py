@@ -35,6 +35,27 @@ intents = discord.Intents.default()
 intents.message_content = True
 client = Client(command_prefix="!", intents=discord.Intents.all()) #required talaga ung command prefix para gumana ung slash commands
 
+class AgreeButton(discord.ui.View):
+    def __init__(self, conn, msc_id, stud_id, discord_username, *, timeout = 180):
+        super().__init__(timeout=timeout)
+        self.msc_id = msc_id
+        self.stud_id = stud_id
+        self.conn = conn
+        self.discord_username = discord_username
+    @discord.ui.button(label="Agree", style=discord.ButtonStyle.green)
+    async def agreee(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer(ephemeral=True)
+        try:
+            sqlconnector.update_user(self.conn, self.msc_id, self.stud_id, self.discord_username)
+        except Exception as e: 
+            print(e)
+            await interaction.followup.send("Updating Credential Failed", ephemeral=True)
+        
+        await interaction.followup.send("Credentials Updated", ephemeral=True)
+
+    
+
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -84,13 +105,15 @@ async def verifyMember(interaction: discord.Interaction, msc_id: str, student_nu
 
 
     elif exists == 3:
-        await interaction.followup.send("You are already verified", ephemeral=True)
+        await interaction.followup.send("You are already verified with this account", ephemeral=True)
     elif exists == 2:
-        await interaction.followup.send("MSC ID is already verified with different discord account. Use /update to change your information", ephemeral=True)
+        await interaction.followup.send("MSC ID is already verified with different discord account. Agree to change the discord account that was binded?", view=AgreeButton(conn, msc_id, student_number, username), ephemeral=True)
+
     elif exists == 1:
-        await interaction.followup.send("Discord account is already verified with different MSC ID. Use /update to change your information", ephemeral=True)
+        await interaction.followup.send("Discord account is already verified with different MSC ID. UAgree to change the discord account that was binded?", view=AgreeButton(conn, msc_id, student_number, username), ephemeral=True)
     else:
         await interaction.followup.send("Verification failed, credentials are not found in the system.", ephemeral=True)
     
+
 
 client.run(os.getenv('BOT_TOKEN'))

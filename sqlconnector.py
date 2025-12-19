@@ -41,19 +41,23 @@ def verify(conn, msc_id, student_no, email):
 
 def check_multiple(conn, msc_id, discord_username):
     cursor = conn.cursor()
-    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE MSC_ID = %s)", (msc_id,))
-    msc_id_exists = cursor.fetchone()[0]
-    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE DISCORD_USERNAME = %s)", (discord_username,))
-    discord_username_exists = cursor.fetchone()[0]
 
-    if msc_id_exists and discord_username_exists: # ibig sabihin neto already verified
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE MSC_ID = %s AND DISCORD_USERNAME = %s)", (msc_id, discord_username))
+    exists = cursor.fetchone()[0]
+    if exists:  # ibig sabihin neto already verified
         return 3
-    elif msc_id_exists: #may discord na nakaverify
+
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE MSC_ID = %s)", (msc_id,))
+    exists = cursor.fetchone()[0]
+    if exists:  #may discord na nakaverify
         return 2
-    elif discord_username_exists: #nakalink na sa ibang msc 
+    
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE DISCORD_USERNAME = %s)", (discord_username,))
+    eists = cursor.fetchone()[0]
+    if exists:  #nakalink na sa ibang msc 
         return 1
-    else:
-        return 0
+
+    return 0
 
 
 def add_user(conn, msc_id, stud_id, discord_username):
@@ -61,7 +65,7 @@ def add_user(conn, msc_id, stud_id, discord_username):
     cursor.execute("INSERT INTO student_discord (MSC_ID, STUD_ID, DISCORD_USERNAME) VALUES (%s, %s, %s)", (msc_id, stud_id, discord_username))
     conn.commit()
 
-def update_user(conn, msc_id, discord_username):
+def update_user(conn, msc_id, stud_id, discord_username):
     cursor = conn.cursor()
-    cursor.execute("UPDATE student_discord SET DISCORD_USERNAME=%s WHERE MSC_ID=%s", (discord_username, msc_id))
+    cursor.execute("UPDATE student_discord SET DISCORD_USERNAME=%s WHERE MSC_ID=%s AND STUD_ID=%s", (discord_username, msc_id, stud_id))
     conn.commit()

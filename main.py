@@ -36,17 +36,18 @@ intents.message_content = True
 client = Client(command_prefix="!", intents=discord.Intents.all()) #required talaga ung command prefix para gumana ung slash commands
 
 class AgreeButton(discord.ui.View):
-    def __init__(self, conn, msc_id, stud_id, discord_username, *, timeout = 180):
+    def __init__(self, conn, msc_id, stud_id, discord_username, discord_id, *, timeout = 180):
         super().__init__(timeout=timeout)
         self.msc_id = msc_id
         self.stud_id = stud_id
         self.conn = conn
         self.discord_username = discord_username
+        self.discord_id = discord_id
     @discord.ui.button(label="Agree", style=discord.ButtonStyle.green)
     async def agreee(self, interaction: discord.Interaction, button: discord.ui.Button):
         
         try:
-            sqlconnector.update_user(self.conn, self.msc_id, self.stud_id, self.discord_username)
+            sqlconnector.update_user(self.conn, self.msc_id, self.stud_id, self.discord_username, self.discord_id)
         except Exception as e: 
             print(e)
             await interaction.response.send_message("Updating Credential Failed", ephemeral=True)
@@ -94,8 +95,11 @@ async def verifyMember(interaction: discord.Interaction, msc_id: str, student_nu
     await interaction.response.defer(ephemeral=True)
 
     conn = sqlconnector.initialize()
+
     username = str(interaction.user)
-    exists = sqlconnector.check_multiple(conn, msc_id, username)
+    discord_id = str(interaction.user.id)
+
+    exists = sqlconnector.check_multiple(conn, msc_id, discord_id)
     
 
     if sqlconnector.verify(conn, msc_id, student_number, email) and not exists:
@@ -120,16 +124,16 @@ async def verifyMember(interaction: discord.Interaction, msc_id: str, student_nu
         remove_role = interaction.guild.get_role(UNVERIFIED_ROLE_ID) #gets both roles' ID
         await member.remove_roles(remove_role) #adds Member role and removes Unverified role
         await member.add_roles(add_role)
-        sqlconnector.add_user(conn, msc_id, student_number, username)
+        sqlconnector.add_user(conn, msc_id, student_number, username, discord_id)
 
 
     elif exists == 3:
         await interaction.followup.send("You are already verified with this account", ephemeral=True)
     elif exists == 2:
-        await interaction.followup.send("MSC ID is already verified with different discord account. Agree to change the discord account that was binded?", view=AgreeButton(conn, msc_id, student_number, username), ephemeral=True)
+        await interaction.followup.send("MSC ID is already verified with different discord account. Agree to change the discord account that was binded?", view=AgreeButton(conn, msc_id, student_number, username, discord_id), ephemeral=True)
         
     elif exists == 1:
-        await interaction.followup.send("Discord account is already verified with different MSC ID. Agree to change the discord account that was binded?", view=AgreeButton(conn, msc_id, student_number, username), ephemeral=True)
+        await interaction.followup.send("Discord account is already verified with different MSC ID. Agree to change the discord account that was binded?", view=AgreeButton(conn, msc_id, student_number, username, discord_id), ephemeral=True)
     else:
         await interaction.followup.send("Verification failed, credentials are not found in the system.", ephemeral=True)
     

@@ -39,10 +39,10 @@ def verify(conn, msc_id, student_no, email):
         print("Verification failed. Wrong MSC ID/Student ID/Personal Email")
         return False
 
-def check_multiple(conn, msc_id, discord_username):
+def check_multiple(conn, msc_id, discord_id):
     cursor = conn.cursor()
 
-    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE MSC_ID = %s AND DISCORD_USERNAME = %s)", (msc_id, discord_username))
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE MSC_ID = %s AND DISCORD_ID = %s)", (msc_id, discord_id))
     exists = cursor.fetchone()[0]
     if exists:  # ibig sabihin neto already verified
         return 3
@@ -52,7 +52,7 @@ def check_multiple(conn, msc_id, discord_username):
     if exists:  #may discord na nakaverify
         return 2
     
-    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE DISCORD_USERNAME = %s)", (discord_username,))
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM student_discord WHERE DISCORD_ID = %s)", (discord_id,))
     eists = cursor.fetchone()[0]
     if exists:  #nakalink na sa ibang msc 
         return 1
@@ -60,12 +60,12 @@ def check_multiple(conn, msc_id, discord_username):
     return 0
 
 
-def add_user(conn, msc_id, stud_id, discord_username):
+def add_user(conn, msc_id, stud_id, discord_username, discord_id):
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO student_discord (MSC_ID, STUD_ID, DISCORD_USERNAME) VALUES (%s, %s, %s)", (msc_id, stud_id, discord_username))
+    cursor.execute("INSERT INTO student_discord (MSC_ID, STUD_ID, DISCORD_USERNAME, DISCORD_ID) VALUES (%s, %s, %s, %s)", (msc_id, stud_id, discord_username, discord_id))
     conn.commit()
 
-def update_user(conn, msc_id, stud_id, discord_username):
+def update_user(conn, msc_id, stud_id, discord_username, discord_id):
     cursor = conn.cursor()
-    cursor.execute("UPDATE student_discord SET DISCORD_USERNAME=%s WHERE MSC_ID=%s AND STUD_ID=%s", (discord_username, msc_id, stud_id))
+    cursor.execute("UPDATE student_discord SET DISCORD_USERNAME=%s AND SET DISCORD_ID=%s WHERE MSC_ID=%s AND STUD_ID=%s", (discord_username, discord_id, msc_id, stud_id))
     conn.commit()

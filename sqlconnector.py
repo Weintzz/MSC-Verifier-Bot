@@ -69,3 +69,9 @@ def update_user(conn, msc_id, stud_id, discord_username, discord_id):
     cursor = conn.cursor()
     cursor.execute("UPDATE student_discord SET DISCORD_USERNAME=%s AND SET DISCORD_ID=%s WHERE MSC_ID=%s AND STUD_ID=%s", (discord_username, discord_id, msc_id, stud_id))
     conn.commit()
+
+def get_discord_id(conn, msc_id):
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISCORD_ID FROM student_discord WHERE MSC_ID=%s", (msc_id,))
+    return cursor.fetchone()[0]
+

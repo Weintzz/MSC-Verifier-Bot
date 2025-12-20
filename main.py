@@ -47,10 +47,27 @@ class AgreeButton(discord.ui.View):
     async def agreee(self, interaction: discord.Interaction, button: discord.ui.Button):
         
         try:
+
+            guild = interaction.guild
+
+            member = guild.get_member(int(self.discord_id))
+            ROLE_ID = int(os.getenv("VERIFIED_ROLE_ID")) #.env variable for Member Role
+            UNVERIFIED_ROLE_ID = int(os.getenv("UNVERIFIED_ROLE_ID")) #.env variable for Unverified Role
+            member_role = interaction.guild.get_role(ROLE_ID)
+            unverified_role = interaction.guild.get_role(UNVERIFIED_ROLE_ID) #gets both roles' ID
+            await member.remove_roles(unverified_role) #adds Member role and removes Unverified role
+            await member.add_roles(member_role)
+
+            prev_member = guild.get_member(int(sqlconnector.get_discord_id(self.msc_id)))
+            await prev_member.remove_roles(member_role)
+            await prev_member.add_roles(unverified_role)
+
+
             sqlconnector.update_user(self.conn, self.msc_id, self.stud_id, self.discord_username, self.discord_id)
         except Exception as e: 
             print(e)
             await interaction.response.send_message("Updating Credential Failed", ephemeral=True)
+        
         
         
         button.disabled = True
@@ -119,11 +136,11 @@ async def verifyMember(interaction: discord.Interaction, msc_id: str, student_nu
 
         ROLE_ID = int(os.getenv("VERIFIED_ROLE_ID")) #.env variable for Member Role
         UNVERIFIED_ROLE_ID = int(os.getenv("UNVERIFIED_ROLE_ID")) #.env variable for Unverified Role
-
-        add_role = interaction.guild.get_role(ROLE_ID)
-        remove_role = interaction.guild.get_role(UNVERIFIED_ROLE_ID) #gets both roles' ID
-        await member.remove_roles(remove_role) #adds Member role and removes Unverified role
-        await member.add_roles(add_role)
+        member_role = interaction.guild.get_role(ROLE_ID)
+        unverified_role = interaction.guild.get_role(UNVERIFIED_ROLE_ID) #gets both roles' ID
+        await member.remove_roles(unverified_role) #adds Member role and removes Unverified role
+        await member.add_roles(member_role)
+        
         sqlconnector.add_user(conn, msc_id, student_number, username, discord_id)
 
 
